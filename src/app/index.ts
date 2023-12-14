@@ -3,7 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import "dotenv/config"; // 引入 dotenv 並執行 config()
 // import dotenv from "dotenv/config"; // dotenv 原來的寫法
-import "./connection"; // 資料庫連線
+import "@/app/connection"; // 資料庫連線
 // import Routes from '@/routes'; // 引入所有路由
 // import * as Exception from '@/app/exception'; // 引入自定義的例外處理
 
