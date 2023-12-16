@@ -2,6 +2,8 @@
   "compilerOptions": {
     /* 設定編譯過程中要使用的 JavaScript 版本 */
     "target": "ESNext",
+    /* 允許匯入 JSON 檔案 */
+    "resolveJsonModule": true,
     /* 指定生成的模組代碼類型 */
     "module": "commonjs",
     /* 指定 TypeScript 如何從給定的模組找文件 */

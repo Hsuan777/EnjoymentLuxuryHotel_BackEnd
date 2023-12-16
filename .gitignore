@@ -23,4 +23,4 @@ dist-ssr
 *.sln
 *.sw?
 .env
-develop/swagger_output.json
+swagger/swagger_output.json
