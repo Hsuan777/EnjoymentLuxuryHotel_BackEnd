@@ -7,6 +7,7 @@
     "start": "node dist/index.js",
     "dev": "tsx watch src/app/index.ts",
     "swagger-autogen": "node swagger/swaggerAutogen.js",
+    "postinstall": "npm run swagger-autogen",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
