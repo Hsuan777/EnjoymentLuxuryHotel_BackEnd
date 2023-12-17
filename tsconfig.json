@@ -5,7 +5,7 @@
     /* 允許匯入 JSON 檔案 */
     "resolveJsonModule": true,
     /* 指定生成的模組代碼類型 */
-    "module": "commonjs",
+    "module": "ESNext",
     /* 指定 TypeScript 如何從給定的模組找文件 */
     "moduleResolution": "Node",
     /* 指定輸出文件夾 */
