@@ -2,12 +2,13 @@ import { Router } from "express";
 import healthCheck from "./healthCheck";
 import swagger from "./swagger";
 import user from "./api/v1/user";
+import verify from "./api/v1/verify";
 
-const routers = Router();
+const routes = Router();
 
-routers.use(swagger);
-routers.use(healthCheck); // 本身路徑為根目錄 ”/“
-routers.use(
+routes.use(swagger);
+routes.use(healthCheck); // 本身路徑為根目錄 ”/“
+routes.use(
   /**
    * #swagger.tags = ["Users - 使用者"]
    */
@@ -15,4 +16,12 @@ routers.use(
   user
 );
 
-export default routers;
+routes.use(
+  /**
+   * #swagger.tags = ["Verify - 驗證"]
+   */
+  "/api/v1/verify",
+  verify
+);
+
+export default routes;
