@@ -7,6 +7,7 @@ export const generateToken = (payload: { userId?: string }) => {
   });
 };
 
+// 使用 userId 所產生的 token 進行驗證
 export const verifyToken = (token: string) => {
   try {
     return jsonWebToken.verify(
@@ -19,13 +20,17 @@ export const verifyToken = (token: string) => {
 };
 
 export const generateEmailToken = () => {
-  const code = generateRandomCode();
+  const verificationCode = generateRandomCode();
 
-  const token = jsonWebToken.sign({ code }, process.env.JWT_SECRET || "", {
-    expiresIn: 3600,
-  });
+  const emailToken = jsonWebToken.sign(
+    { verificationCode },
+    process.env.JWT_SECRET || "",
+    {
+      expiresIn: 3600,
+    }
+  );
 
-  return { code, token };
+  return { verificationCode, emailToken };
 };
 
 const generateRandomCode = () => {

@@ -4,7 +4,7 @@ import validator from "validator";
 import UsersModel from "@/models/user";
 import { verifyToken } from "@/utils";
 
-// token 驗證
+// token 驗證，用於需要登入才能使用的 API
 export const isAuth: RequestHandler = async (req, _res, next) => {
   /**
      * #swagger.security = [{ "bearerAuth": [] }]
@@ -19,12 +19,11 @@ export const isAuth: RequestHandler = async (req, _res, next) => {
   try {
     const token = `${req.headers.authorization?.replace("Bearer ", "")}`;
     const result = verifyToken(token);
-
     const user = await UsersModel.findById(result.userId);
     if (!user) {
       throw createHttpError(404, "此使用者不存在");
     }
-
+    // @ts-ignore
     req.user ??= user;
 
     next();
