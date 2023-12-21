@@ -2,7 +2,7 @@ import type { Request, RequestHandler } from "express";
 import UsersModel from "@/models/user";
 import createHttpError from "http-errors";
 import bcrypt from "bcryptjs";
-import { generateToken } from "@/utils";
+import { generateToken, verifyToken } from "@/utils";
 
 export const signup: RequestHandler = async (req: Request, res, next) => {
   try {
@@ -57,6 +57,43 @@ export const login: RequestHandler = async (req, res, next) => {
       user,
     });
   } catch (error) {
+    next(error);
+  }
+};
+
+// 用於忘記密碼時，驗證信箱驗證碼是否正確，若正確則將新密碼更新至資料庫
+export const forget: RequestHandler = async (req, res, next) => {
+  try {
+    const { email, code, newPassword } = req.body;
+
+    const user = await UsersModel.findOne({ email }).select(
+      "+verificationToken"
+    );
+    if (!user) {
+      throw createHttpError(404, "此使用者不存在");
+    }
+
+    const payload = verifyToken(user.verificationToken);
+
+    if (payload.code === code) {
+      await UsersModel.findByIdAndUpdate(
+        user._id,
+        {
+          password: await bcrypt.hash(newPassword, 6),
+        },
+        {
+          new: true,
+        }
+      );
+    } else {
+      throw createHttpError(400, "驗證碼錯誤");
+    }
+
+    res.send({
+      status: true,
+    });
+  } catch (error) {
+    console.log(error);
     next(error);
   }
 };

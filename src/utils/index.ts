@@ -20,17 +20,13 @@ export const verifyToken = (token: string) => {
 };
 
 export const generateEmailToken = () => {
-  const verificationCode = generateRandomCode();
+  const code = generateRandomCode();
 
-  const emailToken = jsonWebToken.sign(
-    { verificationCode },
-    process.env.JWT_SECRET || "",
-    {
-      expiresIn: 3600,
-    }
-  );
+  const emailToken = jsonWebToken.sign({ code }, process.env.JWT_SECRET || "", {
+    expiresIn: 3600,
+  });
 
-  return { verificationCode, emailToken };
+  return { code, emailToken };
 };
 
 const generateRandomCode = () => {

@@ -60,31 +60,4 @@ router.post(
   VerifyController.sendVerificationCode
 );
 
-router.post(
-  /**
-     * #swagger.description  = "驗證信箱驗證碼"
-     * #swagger.parameters['body'] = {
-            in: 'body',
-            required: true,
-            schema: {
-                verificationCode: ""
-            }
-        }
-      * #swagger.responses[200] = {
-              schema: {
-                  "status": true,
-              }
-          }
-      * #swagger.responses[400] = {
-              schema: {
-                  "status": false,
-                  "message": "驗證碼不正確",
-              }
-          }
-      */
-  "/verifyEmailCode",
-  isAuth,
-  VerifyController.verifyCode
-);
-
 export default router;
