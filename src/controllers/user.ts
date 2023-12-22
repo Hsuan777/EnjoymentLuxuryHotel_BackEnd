@@ -80,6 +80,7 @@ export const forget: RequestHandler = async (req, res, next) => {
         user._id,
         {
           password: await bcrypt.hash(newPassword, 6),
+          verificationToken: "",
         },
         {
           new: true,

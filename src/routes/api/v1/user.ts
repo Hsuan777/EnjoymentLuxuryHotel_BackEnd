@@ -1,11 +1,12 @@
 import { Router } from "express";
 import * as UserController from "@/controllers/user";
+import { checkRequestBodyValidator } from "@/middlewares";
 
 const router = Router();
 
 router.post(
   /**
-   * #swagger.description  = "註冊"
+   * #swagger.description  = "注意！！若使用假信箱，將收不到驗證碼，也就無法使用相關服務"
    * #swagger.parameters['body'] = {
           in: 'body',
           required: true,
@@ -112,6 +113,7 @@ router.post(
       }
    */
   "/forgot",
+  checkRequestBodyValidator,
   UserController.forget
 );
 export default router;
