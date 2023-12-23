@@ -2,7 +2,7 @@ import createHttpError from "http-errors";
 import jsonWebToken, { type JwtPayload } from "jsonwebtoken";
 
 export const generateToken = (payload: { userId?: string }) => {
-  return jsonWebToken.sign(payload, process.env.JWT_SECRET || "", {
+  return jsonWebToken.sign(payload, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_DAY,
   });
 };
@@ -10,10 +10,7 @@ export const generateToken = (payload: { userId?: string }) => {
 // 使用 userId 所產生的 token 進行驗證
 export const verifyToken = (token: string) => {
   try {
-    return jsonWebToken.verify(
-      token,
-      process.env.JWT_SECRET || ""
-    ) as JwtPayload;
+    return jsonWebToken.verify(token, process.env.JWT_SECRET) as JwtPayload;
   } catch (error) {
     throw createHttpError(403, "請重新登入");
   }
@@ -22,7 +19,7 @@ export const verifyToken = (token: string) => {
 export const generateEmailToken = () => {
   const code = generateRandomCode();
 
-  const emailToken = jsonWebToken.sign({ code }, process.env.JWT_SECRET || "", {
+  const emailToken = jsonWebToken.sign({ code }, process.env.JWT_SECRET, {
     expiresIn: 3600,
   });
 

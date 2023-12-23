@@ -7,7 +7,7 @@ mongoose.set("strictQuery", false);
 
 // connect 參數 uri 為 string，但 DATABASE_PASSWORD 為 string | undefined，所以會出錯。
 mongoose
-  .connect((DATABASE || "").replace("<password>", `${DATABASE_PASSWORD}`))
+  .connect(DATABASE.replace("<password>", `${DATABASE_PASSWORD}`))
   .then(() => {
     console.log("[ mongodb 連線成功 ]");
   })
