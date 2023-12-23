@@ -98,3 +98,74 @@ export const forget: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+export const check: RequestHandler = async (_req, res) => {
+  res.send({
+    status: true,
+  });
+};
+
+export const getInfo: RequestHandler = async (req, res) => {
+  res.send({
+    status: true,
+    result: req.user,
+  });
+};
+
+export const updateInfo: RequestHandler = async (req, res, next) => {
+  try {
+    // 若有 req.user 有 oldPassword 與 newPassword，則嘗試更新密碼
+    await updateUserPassword(req);
+
+    const { userId, name, phone, birthday } = req.body;
+
+    const result = await UsersModel.findByIdAndUpdate(
+      userId,
+      {
+        name,
+        phone,
+        birthday,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    if (!result) throw createHttpError(400, "缺少必要欄位");
+    res.send({
+      status: true,
+      result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateUserPassword = async (req: Request) => {
+  const { userId, oldPassword, newPassword } = req.body;
+  if (!oldPassword || !newPassword) {
+    return null;
+  }
+
+  const user = await UsersModel.findById(userId).select("+password");
+  if (!user) {
+    throw createHttpError(404, "此使用者不存在");
+  }
+
+  const checkPassword = await bcrypt.compare(oldPassword, user.password);
+  if (!checkPassword) {
+    throw createHttpError(400, "密碼錯誤");
+  }
+
+  const result = await UsersModel.findByIdAndUpdate(
+    userId,
+    {
+      password: await bcrypt.hash(newPassword, 6),
+    },
+    {
+      new: true,
+    }
+  );
+
+  return result;
+};

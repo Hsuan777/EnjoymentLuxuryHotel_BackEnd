@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as UserController from "@/controllers/user";
-import { checkRequestBodyValidator } from "@/middlewares";
+import { checkRequestBodyValidator, isAuth } from "@/middlewares";
 
 const router = Router();
 
@@ -116,4 +116,77 @@ router.post(
   checkRequestBodyValidator,
   UserController.forget
 );
+
+router.get(
+  /**
+   * #swagger.description  = "檢查是否登入"
+   * #swagger.responses[200] = {
+          description: '登入成功',
+          schema: {
+              "status": true,
+          }
+      }
+   */
+  "/check",
+  isAuth,
+  UserController.check
+);
+
+router.get(
+  /**
+   * #swagger.description  = "取得使用者資訊"
+   * #swagger.responses[200] = {
+          schema: {
+              "status": true,
+              "token": "eyJhbGciOiJI....",
+              "result": {
+                  "_id": "6533f0ef4cdf5b7f762747b0",
+                  "name": "Vic",
+                  "email": "vics@example.com",
+                  "phone": "0922123456",
+                  "birthday": "1982-02-03T16:00:00.000Z",
+                  "createdAt": "2023-12-20T15:40:31.526Z",
+                  "updatedAt": "2023-12-20T15:40:31.526Z",
+              }
+          }
+      }
+   */
+  "/",
+  isAuth,
+  UserController.getInfo
+);
+
+router.put(
+  /**
+   * #swagger.description  = "更新使用者資訊"
+   * #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+              userId: "6523e9fc3a22dd8d8207ef80",
+              name: "Vics",
+              phone: "0922123456",
+              birthday: "1948/6/5",
+              oldPassword: "舊密碼",
+              newPassword: "新密碼",
+          }
+      }
+   * #swagger.responses[400] = {
+          schema: {
+              "status": false,
+              "message": "密碼錯誤",
+          }
+      }
+   * #swagger.responses[404] = {
+          schema: {
+              "status": false,
+              "message": "此使用者不存在",
+          }
+      }
+   */
+  "/",
+  isAuth,
+  UserController.updateInfo
+);
+
 export default router;
