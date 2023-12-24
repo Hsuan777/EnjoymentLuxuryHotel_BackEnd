@@ -16,13 +16,14 @@ export const notFound: RequestHandler = (req, res, next) => {
   });
 };
 
-// 400 Bad Request
+// 400 Bad Request，所有 next(error) 都會進到這裡
 export const badRequest: ErrorRequestHandler = (err, _req, res, next) => {
-  // 處理不同的錯誤訊息
   res.status(400).send({
     status: false,
     message:
-      process.env.NODE_ENV === "production" ? "請求錯誤喔！😛" : err.stack,
+      process.env.NODE_ENV === "production"
+        ? "請求錯誤喔！請檢查請求路徑、類型、欄位以及資料格式是否正確。"
+        : err.stack,
   });
 };
 
