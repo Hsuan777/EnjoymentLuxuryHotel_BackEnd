@@ -3,6 +3,7 @@ import healthCheck from "./healthCheck";
 import swagger from "./swagger";
 import user from "./api/v1/user";
 import verify from "./api/v1/verify";
+import news from "./api/v1/news";
 
 const routes = Router();
 
@@ -22,6 +23,14 @@ routes.use(
    */
   "/api/v1/verify",
   verify
+);
+
+routes.use(
+  /**
+   * #swagger.tags = ["News - 最新消息"]
+   */
+  "/api/v1/news",
+  news
 );
 
 export default routes;

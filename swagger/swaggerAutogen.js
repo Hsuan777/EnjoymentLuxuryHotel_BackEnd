@@ -21,6 +21,19 @@ const doc = {
       name: "Vic",
       avatar: "https://fakeimg.pl/350x200/?text=öㅅö",
     },
+    NewsResponses: {
+      id: "6587a5bf67e2dc1d3249b558",
+      title: "Vic 享樂旅館開幕囉",
+      description: "Vic 享樂旅館開幕囉",
+      image: "https://fakeimg.pl/350x200/?text=享樂旅館開幕囉",
+      createdAt: "2021-07-14T09:21:43.000Z",
+      updatedAt: "2021-07-14T09:21:43.000Z",
+    },
+    NewsRequestBody: {
+      title: "Vic 享樂旅館開幕囉",
+      description: "Vic 享樂旅館開幕囉",
+      image: "https://fakeimg.pl/350x200/?text=享樂旅館開幕囉",
+    },
   },
 };
 

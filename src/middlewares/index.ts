@@ -82,3 +82,15 @@ export const checkRequestBodyValidator: RequestHandler = (req, _res, next) => {
     next(error);
   }
 };
+
+export const checkObjectID: RequestHandler = (req, _res, next) => {
+  try {
+    if (!validator.isMongoId(req.params.id)) {
+      throw createHttpError(400, "無此資料");
+    }
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
