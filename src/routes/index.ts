@@ -4,6 +4,7 @@ import swagger from "./swagger";
 import user from "./api/v1/user";
 import verify from "./api/v1/verify";
 import news from "./api/v1/news";
+import room from "./api/v1/room";
 
 const routes = Router();
 
@@ -31,6 +32,14 @@ routes.use(
    */
   "/api/v1/news",
   news
+);
+
+routes.use(
+  /**
+   * #swagger.tags = ["Room - 房型"]
+   */
+  "/api/v1/room",
+  room
 );
 
 export default routes;

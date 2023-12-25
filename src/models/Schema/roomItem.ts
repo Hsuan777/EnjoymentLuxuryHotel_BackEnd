@@ -56,7 +56,10 @@ const layoutItemSchema = new Schema<LayoutItem>(
   {
     title: {
       type: String,
-      enum: Object.values(EnumLayoutItem),
+      enum: {
+        values: Object.values(EnumLayoutItem),
+        message: "title 非房間格局列舉項目之一",
+      },
       required: [true, "title 未填寫"],
     },
     isProvide: {
@@ -71,7 +74,10 @@ const facilityInfoSchema = new Schema<FacilityItem>(
   {
     title: {
       type: String,
-      enum: Object.values(EnumFacilityItem),
+      enum: {
+        values: Object.values(EnumFacilityItem),
+        message: "title 非房內設備列舉項目之一",
+      },
       required: [true, "title 未填寫"],
     },
     isProvide: {
@@ -86,7 +92,10 @@ const amenityItemSchema = new Schema<AmenityItem>(
   {
     title: {
       type: String,
-      enum: Object.values(EnumAmenityItem),
+      enum: {
+        values: Object.values(EnumAmenityItem),
+        message: "title 非備品提供列舉項目之一",
+      },
       required: [true, "title 未填寫"],
     },
     isProvide: {

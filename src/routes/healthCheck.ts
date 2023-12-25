@@ -3,6 +3,7 @@ import express, { Router } from "express";
 const router = Router();
 
 router.get("/", (req, res) => {
+  // #swagger.ignore = true
   const healthCheck = {
     status: true,
     message: "OK, Express + TypeScript Server",

@@ -39,7 +39,7 @@ export const getRoomById: RequestHandler = async (req, res, next) => {
 export const createOneRoom: RequestHandler = async (req, res, next) => {
   try {
     const {
-      title,
+      name,
       description,
       imageUrlList,
       imageUrl,
@@ -54,7 +54,7 @@ export const createOneRoom: RequestHandler = async (req, res, next) => {
     } = req.body;
 
     const result = await RoomModel.create({
-      title,
+      name,
       description,
       imageUrl,
       imageUrlList,
@@ -80,7 +80,7 @@ export const createOneRoom: RequestHandler = async (req, res, next) => {
 export const updateRoomById: RequestHandler = async (req, res, next) => {
   try {
     const {
-      title,
+      name,
       description,
       imageUrl,
       imageUrlList,
@@ -97,7 +97,7 @@ export const updateRoomById: RequestHandler = async (req, res, next) => {
     const result = await RoomModel.findByIdAndUpdate(
       req.params.id,
       {
-        title,
+        name,
         description,
         imageUrl,
         imageUrlList,
@@ -146,7 +146,6 @@ export const deleteRoomById: RequestHandler = async (req, res, next) => {
 
     res.send({
       status: true,
-      result,
     });
   } catch (error) {
     next(error);

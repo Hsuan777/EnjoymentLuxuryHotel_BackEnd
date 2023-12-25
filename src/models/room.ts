@@ -41,41 +41,23 @@ const newsSchema = new Schema<IRoom>(
       required: [true, "imageUrl 未填寫"],
       validate: {
         validator(value: string) {
-          const isValidUrl = validator.isURL(value, { protocols: ["https"] });
-          const allowedExtensions = ["jpg", "jpeg", "png", "gif"];
-          const urlExtension = new URL(value).pathname
-            .split(".")
-            .pop()
-            ?.toLowerCase();
-          return (
-            isValidUrl &&
-            urlExtension &&
-            allowedExtensions.includes(urlExtension)
-          );
+          return validator.isURL(value, { protocols: ["https"] });
         },
         message: "imageUrl 網址協定或附檔名不正確",
       },
     },
-    imageUrlList: {
-      type: [String],
-      required: [true, "imageUrlList 未填寫"],
-      validate: {
-        validator(value: string[]) {
-          const isValidUrlList = value.every((url) =>
-            validator.isURL(url, { protocols: ["https"] })
-          );
-          const allowedExtensions = ["jpg", "jpeg", "png", "gif"];
-          const urlExtensionList = value.map((url) =>
-            new URL(url).pathname.split(".").pop()?.toLowerCase()
-          );
-          const isValidExtensionList = urlExtensionList.every((extension) =>
-            allowedExtensions.includes(extension || "")
-          );
-          return isValidUrlList && isValidExtensionList;
+    imageUrlList: [
+      {
+        type: String,
+        trim: true,
+        validate: {
+          validator(value: string) {
+            return validator.isURL(value, { protocols: ["https"] });
+          },
+          message: "imageUrlList 格式不正確",
         },
-        message: "imageUrl 網址協定或附檔名不正確",
       },
-    },
+    ],
     areaInfo: {
       type: String,
       required: [true, "areaInfo 未填寫"],
