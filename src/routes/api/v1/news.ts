@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as NewController from "@/controllers/new";
+import * as NewsController from "@/controllers/news";
 import { checkObjectID, isAuth } from "@/middlewares";
 
 const router = Router();
@@ -18,7 +18,7 @@ router.get(
         }
      */
   "/",
-  NewController.getNewsList
+  NewsController.getNewsList
 );
 
 // 取得單筆最新消息
@@ -40,7 +40,7 @@ router.get(
      */
   "/:id",
   checkObjectID,
-  NewController.getNewsById
+  NewsController.getNewsById
 );
 
 // 新增一筆最新消息，需驗證身分
@@ -64,7 +64,7 @@ router.post(
      */
   "/",
   isAuth,
-  NewController.createOneNews
+  NewsController.createOneNews
 );
 
 // 更新單筆最新消息，需驗證身分
@@ -95,7 +95,7 @@ router.patch(
   "/:id",
   isAuth,
   checkObjectID,
-  NewController.updateNewsById
+  NewsController.updateNewsById
 );
 
 // 刪除單筆最新消息，需驗證身分
@@ -117,7 +117,7 @@ router.delete(
   "/:id",
   isAuth,
   checkObjectID,
-  NewController.deleteNewsById
+  NewsController.deleteNewsById
 );
 
 export default router;

@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express";
 import createHttpError from "http-errors";
-import NewsModel from "@/models/new";
+import NewsModel from "@/models/news";
 
 export const getNewsList: RequestHandler = async (_req, res, next) => {
   try {

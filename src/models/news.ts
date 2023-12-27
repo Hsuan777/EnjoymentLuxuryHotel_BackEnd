@@ -1,13 +1,13 @@
 import { Schema, model, type Document } from "mongoose";
 import validator from "validator";
 
-export interface INew extends Document {
+export interface INews extends Document {
   title: string;
   description: string;
   image: string;
 }
 
-const newsSchema = new Schema<INew>(
+const newsSchema = new Schema<INews>(
   {
     title: {
       type: String,
