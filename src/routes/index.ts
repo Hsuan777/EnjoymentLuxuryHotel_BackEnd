@@ -5,6 +5,7 @@ import user from "./api/v1/user";
 import verify from "./api/v1/verify";
 import news from "./api/v1/news";
 import room from "./api/v1/room";
+import order from "./api/v1/order";
 
 const routes = Router();
 
@@ -40,6 +41,14 @@ routes.use(
    */
   "/api/v1/room",
   room
+);
+
+routes.use(
+  /**
+   * #swagger.tags = ["Order - 訂單"]
+   */
+  "/api/v1/order",
+  order
 );
 
 export default routes;
