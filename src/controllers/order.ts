@@ -4,9 +4,9 @@ import OrderModel from "@/models/order";
 
 export const getOrderList: RequestHandler = async (_req, res, next) => {
   try {
-    const result = await OrderModel.find()
-      .populate({ path: "userId" })
-      .populate({ path: "bookingInfo.roomTypeId" });
+    const result = await OrderModel.find({ status: { $ne: -1 } }).populate({
+      path: "bookingInfo.roomTypeId",
+    });
 
     res.send({
       status: true,
@@ -19,10 +19,9 @@ export const getOrderList: RequestHandler = async (_req, res, next) => {
 
 export const getOrderById: RequestHandler = async (req, res, next) => {
   try {
-    // TODO: { userId: req.params.id }
-    const result = await OrderModel.findById(req.params.id)
-      .populate("userId")
-      .populate("bookingInfo.roomTypeId");
+    const result = await OrderModel.findById(req.params.id).populate(
+      "bookingInfo.roomTypeId"
+    );
     if (!result) {
       throw createHttpError(404, "此訂單不存在");
     }
@@ -49,10 +48,7 @@ export const createOrder: RequestHandler = async (req, res, next) => {
 
     const result = await order.save();
 
-    await OrderModel.populate(result, [
-      { path: "userId" },
-      { path: "booking.roomTypeId" },
-    ]);
+    await OrderModel.populate(result, [{ path: "bookingInfo.roomTypeId" }]);
 
     res.send({
       status: true,
@@ -71,9 +67,7 @@ export const updateOrderById: RequestHandler = async (req, res, next) => {
       req.params.id,
       { bookingInfo, guestCount, totalPrice, notes, status },
       { new: true, runValidators: true }
-    )
-      .populate("userId")
-      .populate("bookingInfo.roomTypeId");
+    ).populate("bookingInfo.roomTypeId");
 
     if (!result) {
       throw createHttpError(404, "此訂單不存在");
@@ -91,15 +85,10 @@ export const updateOrderById: RequestHandler = async (req, res, next) => {
 export const deleteOrderById: RequestHandler = async (req, res, next) => {
   try {
     const result = await OrderModel.findByIdAndUpdate(
-      {
-        _id: req.params.orderId,
-        userId: req.user?._id,
-      },
+      req.params.id,
       { status: -1 },
       { new: true, runValidators: true }
-    )
-      .populate("userId")
-      .populate("bookingInfo.roomTypeId");
+    );
 
     if (!result) {
       throw createHttpError(404, "此訂單不存在");

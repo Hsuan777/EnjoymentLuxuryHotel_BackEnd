@@ -133,6 +133,39 @@ const doc = {
       createdAt: "2021-07-14T09:21:43.000Z",
       updatedAt: "2021-07-14T09:21:43.000Z",
     },
+    OrderRequestBody: {
+      userId: "60f0b4e3f5f4c5b0a8d3e3e9",
+      bookingInfo: [
+        {
+          roomTypeId: "658994aed0a2d285c73e49bc",
+          quantity: 1,
+          arrivalDate: "2023-12-28T09:21:43.000Z",
+          departureDate: "2023-12-28T09:21:43.000Z",
+        },
+      ],
+      guestCount: 2,
+      totalPrice: 10000,
+      notes: "旅行",
+    },
+    OrderResponses: {
+      _id: "6587a5bf67e2dc1d3249b558",
+      userId: "60f0b4e3f5f4c5b0a8d3e3e9",
+      bookingInfo: [
+        {
+          roomTypeId: "658994aed0a2d285c73e49bc",
+          quantity: 1,
+          arrivalDate: "2023-12-28T09:21:43.000Z",
+          departureDate: "2023-12-28T09:21:43.000Z",
+        },
+      ],
+      guestCount: 2,
+      isPay: false,
+      totalPrice: 10000,
+      status: 0,
+      notes: "旅行",
+      createdAt: "2023-12-28T14:55:04.013Z",
+      updatedAt: "2023-12-28T14:55:04.013Z",
+    },
   },
 };
 

@@ -70,7 +70,7 @@ router.post(
 );
 
 // 更新一筆訂單
-router.put(
+router.patch(
   /**
      * #swagger.description  = "更新一筆訂單"
      * #swagger.parameters['update'] = {

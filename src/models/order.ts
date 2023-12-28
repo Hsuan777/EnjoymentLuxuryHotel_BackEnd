@@ -22,14 +22,14 @@ const orderSchema = new Schema<IOrder>(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
       required: [true, "userId 未填寫"],
     },
     bookingInfo: [
       {
         roomTypeId: {
           type: Schema.Types.ObjectId,
-          ref: "Room",
+          ref: "room",
           required: [true, "roomType 未填寫"],
         },
         quantity: {
