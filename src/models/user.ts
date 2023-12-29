@@ -9,6 +9,7 @@ export interface IUser extends Document {
   phone: string;
   birthday: Date;
   verificationToken: string;
+  isAdmin: boolean;
 }
 
 const userSchema = new Schema<IUser>(
@@ -60,6 +61,7 @@ const userSchema = new Schema<IUser>(
     },
     // 驗證碼，用來驗證信箱或是重設密碼
     verificationToken: { type: String, default: "", select: false },
+    isAdmin: { type: Boolean, default: false },
   },
   {
     versionKey: false,

@@ -117,7 +117,7 @@ export const updateInfo: RequestHandler = async (req, res, next) => {
     // 若有 req.user 有 oldPassword 與 newPassword，則嘗試更新密碼
     await updateUserPassword(req);
 
-    const { userId, name, phone, birthday } = req.body;
+    const { userId, name, phone, birthday, isAdmin } = req.body;
 
     const result = await UsersModel.findByIdAndUpdate(
       userId,
@@ -125,6 +125,7 @@ export const updateInfo: RequestHandler = async (req, res, next) => {
         name,
         phone,
         birthday,
+        isAdmin,
       },
       {
         new: true,
