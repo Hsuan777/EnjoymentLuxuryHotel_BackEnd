@@ -17,6 +17,24 @@ export const getOrderList: RequestHandler = async (_req, res, next) => {
   }
 };
 
+export const getUserOrderList: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await OrderModel.find({
+      userId: req.user?._id,
+      status: { $ne: -1 },
+    }).populate({
+      path: "bookingInfo.roomTypeId",
+    });
+
+    res.send({
+      status: true,
+      result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getOrderById: RequestHandler = async (req, res, next) => {
   try {
     const result = await OrderModel.findById(req.params.id).populate(

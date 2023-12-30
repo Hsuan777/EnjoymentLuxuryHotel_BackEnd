@@ -23,6 +23,24 @@ router.get(
   OrderController.getOrderList
 );
 
+// 取得使用者所有訂單
+router.get(
+  /**
+     * #swagger.description  = "取得使用者所有訂單"
+     * #swagger.responses[200] = {
+            schema: {
+                "status": true,
+                "result": [
+                    { $ref: '#/definitions/OrderResponses' },
+                ]
+            }
+        }
+     */
+  "/own",
+  isAuth,
+  OrderController.getUserOrderList
+);
+
 // 取得單筆訂單
 router.get(
   /**
