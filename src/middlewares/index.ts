@@ -23,7 +23,6 @@ export const isAuth: RequestHandler = async (req, _res, next) => {
     if (!user) {
       throw createHttpError(404, "此使用者不存在");
     }
-    // @ts-ignore
     req.user ??= user;
 
     next();
@@ -87,6 +86,20 @@ export const checkObjectID: RequestHandler = (req, _res, next) => {
   try {
     if (!validator.isMongoId(req.params.id)) {
       throw createHttpError(400, "無此資料喔！😭");
+    }
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const checkAuthorize: RequestHandler = async (req, _res, next) => {
+  try {
+    const user = await UsersModel.findById(req.user?._id).select("+isAdmin");
+    if (!user?.isAdmin) {
+      console.log("權限不足");
+      throw createHttpError(403, "權限不足！👻");
     }
 
     next();

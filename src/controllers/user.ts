@@ -117,7 +117,7 @@ export const updateInfo: RequestHandler = async (req, res, next) => {
     // 若有 req.user 有 oldPassword 與 newPassword，則嘗試更新密碼
     await updateUserPassword(req);
 
-    const { userId, name, phone, birthday, isAdmin } = req.body;
+    const { userId, name, phone, birthday } = req.body;
 
     const result = await UsersModel.findByIdAndUpdate(
       userId,
@@ -125,7 +125,6 @@ export const updateInfo: RequestHandler = async (req, res, next) => {
         name,
         phone,
         birthday,
-        isAdmin,
       },
       {
         new: true,
@@ -169,4 +168,33 @@ const updateUserPassword = async (req: Request) => {
   );
 
   return result;
+};
+
+export const updateUserAuthorize: RequestHandler = async (req, res, next) => {
+  // #swagger.ignore = true
+  try {
+    const { isAdmin } = req.body;
+
+    const user = await UsersModel.findById(req.params.id).select("+isAdmin");
+    if (!user) {
+      throw createHttpError(404, "此使用者不存在");
+    }
+
+    const result = await UsersModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        isAdmin,
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (!result) throw createHttpError(400, "缺少必要欄位");
+    res.send({
+      status: true,
+    });
+  } catch (error) {
+    next(error);
+  }
 };

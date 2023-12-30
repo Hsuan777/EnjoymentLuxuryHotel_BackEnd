@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as OrderController from "@/controllers/order";
-import { checkObjectID, isAuth } from "@/middlewares";
+import { checkObjectID, isAuth, checkAuthorize } from "@/middlewares";
 
 const router = Router();
 
@@ -19,6 +19,7 @@ router.get(
      */
   "/",
   isAuth,
+  checkAuthorize,
   OrderController.getOrderList
 );
 
@@ -41,6 +42,7 @@ router.get(
      */
   "/:id",
   isAuth,
+  checkAuthorize,
   checkObjectID,
   OrderController.getOrderById
 );
@@ -66,6 +68,7 @@ router.post(
      */
   "/",
   isAuth,
+  checkAuthorize,
   OrderController.createOrder
 );
 
@@ -96,6 +99,7 @@ router.patch(
      */
   "/:id",
   isAuth,
+  checkAuthorize,
   checkObjectID,
   OrderController.updateOrderById
 );
@@ -118,6 +122,7 @@ router.delete(
      */
   "/:id",
   isAuth,
+  checkAuthorize,
   checkObjectID,
   OrderController.deleteOrderById
 );

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as NewsController from "@/controllers/news";
-import { checkObjectID, isAuth } from "@/middlewares";
+import { checkObjectID, isAuth, checkAuthorize } from "@/middlewares";
 
 const router = Router();
 
@@ -64,6 +64,7 @@ router.post(
      */
   "/",
   isAuth,
+  checkAuthorize,
   NewsController.createOneNews
 );
 
@@ -94,6 +95,7 @@ router.patch(
      */
   "/:id",
   isAuth,
+  checkAuthorize,
   checkObjectID,
   NewsController.updateNewsById
 );
@@ -116,6 +118,7 @@ router.delete(
      */
   "/:id",
   isAuth,
+  checkAuthorize,
   checkObjectID,
   NewsController.deleteNewsById
 );

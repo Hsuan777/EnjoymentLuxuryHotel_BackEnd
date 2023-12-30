@@ -1,6 +1,11 @@
 import { Router } from "express";
 import * as UserController from "@/controllers/user";
-import { checkRequestBodyValidator, isAuth } from "@/middlewares";
+import {
+  checkRequestBodyValidator,
+  isAuth,
+  checkAuthorize,
+  checkObjectID,
+} from "@/middlewares";
 
 const router = Router();
 
@@ -187,6 +192,14 @@ router.put(
   "/",
   isAuth,
   UserController.updateInfo
+);
+
+router.patch(
+  "/:id/role",
+  isAuth,
+  checkAuthorize,
+  checkObjectID,
+  UserController.updateUserAuthorize
 );
 
 export default router;

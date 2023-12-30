@@ -61,7 +61,7 @@ const userSchema = new Schema<IUser>(
     },
     // 驗證碼，用來驗證信箱或是重設密碼
     verificationToken: { type: String, default: "", select: false },
-    isAdmin: { type: Boolean, default: false },
+    isAdmin: { type: Boolean, default: false, select: false },
   },
   {
     versionKey: false,

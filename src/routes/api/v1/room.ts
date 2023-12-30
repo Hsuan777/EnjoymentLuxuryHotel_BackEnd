@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as RoomController from "@/controllers/room";
-import { checkObjectID, isAuth } from "@/middlewares";
+import { checkObjectID, isAuth, checkAuthorize } from "@/middlewares";
 
 const router = Router();
 
@@ -64,6 +64,7 @@ router.post(
      */
   "/",
   isAuth,
+  checkAuthorize,
   RoomController.createOneRoom
 );
 
@@ -94,6 +95,7 @@ router.patch(
      */
   "/:id",
   isAuth,
+  checkAuthorize,
   checkObjectID,
   RoomController.updateRoomById
 );
@@ -117,6 +119,7 @@ router.delete(
      */
   "/:id",
   isAuth,
+  checkAuthorize,
   checkObjectID,
   RoomController.deleteRoomById
 );

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as VerifyController from "@/controllers/verify";
-import { checkRequestBodyValidator, isAuth } from "@/middlewares";
+import { checkRequestBodyValidator } from "@/middlewares";
 
 const router = Router();
 
