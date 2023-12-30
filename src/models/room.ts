@@ -24,6 +24,14 @@ export interface IRoom extends Document {
   layoutInfo: LayoutItem[]; // 房間格局
   facilityInfo: FacilityItem[]; // 房內設備
   amenityInfo: AmenityItem[]; // 備品提供
+  bookedDates: [
+    {
+      orderId: Schema.Types.ObjectId;
+      userId: Schema.Types.ObjectId;
+      bookedDate: Date;
+      bookedQuantity: number;
+    }
+  ];
 }
 
 const newsSchema = new Schema<IRoom>(
@@ -93,6 +101,27 @@ const newsSchema = new Schema<IRoom>(
     amenityInfo: {
       type: [amenityItemSchema],
       required: [true, "amenityInfo 未填寫"],
+    },
+    bookedDates: {
+      type: [
+        {
+          orderId: {
+            type: Schema.Types.ObjectId,
+            ref: "order",
+            required: [true, "orderId 未填寫"],
+            select: false,
+          },
+          userId: {
+            type: Schema.Types.ObjectId,
+            ref: "user",
+            required: [true, "userId 未填寫"],
+            select: false,
+          },
+          bookedDate: Date,
+          bookedQuantity: Number,
+        },
+      ],
+      default: [],
     },
   },
   {

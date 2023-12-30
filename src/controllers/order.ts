@@ -1,6 +1,7 @@
 import type { RequestHandler } from "express";
 import createHttpError from "http-errors";
 import OrderModel from "@/models/order";
+import RoomModel from "@/models/room";
 
 export const getOrderList: RequestHandler = async (_req, res, next) => {
   try {
@@ -79,16 +80,54 @@ export const createOrder: RequestHandler = async (req, res, next) => {
 
 export const updateOrderById: RequestHandler = async (req, res, next) => {
   try {
-    const { bookingInfo, guestCount, totalPrice, notes, status } = req.body;
+    const { bookingInfo, guestCount, totalPrice, notes, status, isPay } =
+      req.body;
 
     const result = await OrderModel.findByIdAndUpdate(
       req.params.id,
-      { bookingInfo, guestCount, totalPrice, notes, status },
+      { bookingInfo, guestCount, totalPrice, notes, status, isPay },
       { new: true, runValidators: true }
     ).populate("bookingInfo.roomTypeId");
 
     if (!result) {
       throw createHttpError(404, "此訂單不存在");
+    }
+
+    // 如果 status 為 1 以及 isPay 為 true，表示訂單已確認，則更新房型的 bookedDates
+    if (status === 1 && isPay) {
+      const { bookingInfo } = result;
+      for (const item of bookingInfo) {
+        const { roomTypeId, arrivalDate, departureDate, quantity } = item;
+
+        const room = await RoomModel.findById(roomTypeId);
+        if (!room) {
+          throw createHttpError(404, "此房型不存在");
+        }
+
+        const bookedDates = room.bookedDates;
+
+        const dateList = getDatesBetween(arrivalDate, departureDate);
+
+        for (const date of dateList) {
+          const index = bookedDates.findIndex(
+            (item) => item.bookedDate.toISOString() === date.toISOString()
+          );
+
+          if (index === -1) {
+            bookedDates.push({
+              bookedDate: date,
+              bookedQuantity: quantity,
+              orderId: result._id,
+              userId: result.userId,
+            });
+          }
+        }
+        await RoomModel.findByIdAndUpdate(
+          roomTypeId,
+          { bookedDates },
+          { new: true }
+        );
+      }
     }
 
     res.send({
@@ -119,3 +158,13 @@ export const deleteOrderById: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+function getDatesBetween(arrivalDate: Date, departureDate: Date) {
+  const dateList = [];
+  const currentDate = new Date(arrivalDate);
+  while (currentDate < new Date(departureDate)) {
+    dateList.push(new Date(currentDate));
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  return dateList;
+}
