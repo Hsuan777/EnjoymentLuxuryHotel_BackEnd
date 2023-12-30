@@ -166,6 +166,23 @@ const doc = {
       createdAt: "2023-12-28T14:55:04.013Z",
       updatedAt: "2023-12-28T14:55:04.013Z",
     },
+    CulinaryRequestBody: {
+      title: "海霸",
+      description:
+        "以新鮮海產料理聞名，我們的專業廚師選用高雄當地的海鮮，每一道菜都充滿海洋的鮮美與清甜。無論是烤魚、蒸蝦還是煮蛤蜊，都能讓您品嚐到最新鮮的海洋風味。",
+      diningTime: "SUN-MON",
+      image: "https://fakeimg.pl/350x200/?text=海霸.jpg",
+    },
+    CulinaryResponses: {
+      _id: "658fd9b02c2b57f4bb9bfb1c",
+      title: "海霸",
+      description:
+        "以新鮮海產料理聞名，我們的專業廚師選用高雄當地的海鮮，每一道菜都充滿海洋的鮮美與清甜。無論是烤魚、蒸蝦還是煮蛤蜊，都能讓您品嚐到最新鮮的海洋風味。",
+      diningTime: "SUN-MON",
+      image: "https://fakeimg.pl/350x200/?text=海霸.jpg",
+      createdAt: "2023-12-30T14:55:04.013Z",
+      updatedAt: "2023-12-30T14:55:04.013Z",
+    },
   },
 };
 

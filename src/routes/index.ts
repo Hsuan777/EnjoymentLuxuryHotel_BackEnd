@@ -6,6 +6,7 @@ import verify from "./api/v1/verify";
 import news from "./api/v1/news";
 import room from "./api/v1/room";
 import order from "./api/v1/order";
+import culinary from "./api/v1/culinary";
 
 const routes = Router();
 
@@ -49,6 +50,14 @@ routes.use(
    */
   "/api/v1/order",
   order
+);
+
+routes.use(
+  /**
+   * #swagger.tags = ["Culinary - 佳餚"]
+   */
+  "/api/v1/culinary",
+  culinary
 );
 
 export default routes;
