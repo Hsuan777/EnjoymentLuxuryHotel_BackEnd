@@ -24,17 +24,17 @@ export interface IRoom extends Document {
   layoutInfo: LayoutItem[]; // 房間格局
   facilityInfo: FacilityItem[]; // 房內設備
   amenityInfo: AmenityItem[]; // 備品提供
-  bookedDates: [
+  dailyAvailability: [
     {
+      date: Date;
       orderId: Schema.Types.ObjectId;
-      userId: Schema.Types.ObjectId;
-      bookedDate: Date;
       bookedQuantity: number;
     }
   ];
+  availableQuantity: number; // 可用數量
 }
 
-const newsSchema = new Schema<IRoom>(
+const roomSchema = new Schema<IRoom>(
   {
     name: {
       type: String,
@@ -102,26 +102,19 @@ const newsSchema = new Schema<IRoom>(
       type: [amenityItemSchema],
       required: [true, "amenityInfo 未填寫"],
     },
-    bookedDates: {
-      type: [
-        {
-          orderId: {
-            type: Schema.Types.ObjectId,
-            ref: "order",
-            required: [true, "orderId 未填寫"],
-            select: false,
-          },
-          userId: {
-            type: Schema.Types.ObjectId,
-            ref: "user",
-            required: [true, "userId 未填寫"],
-            select: false,
-          },
-          bookedDate: Date,
-          bookedQuantity: Number,
+    dailyAvailability: [
+      {
+        date: Date,
+        orderId: {
+          type: Schema.Types.ObjectId,
+          ref: "order",
         },
-      ],
-      default: [],
+        bookedQuantity: Number,
+      },
+    ],
+    availableQuantity: {
+      type: Number,
+      required: [true, "availableQuantity 未填寫"],
     },
   },
   {
@@ -130,4 +123,4 @@ const newsSchema = new Schema<IRoom>(
   }
 );
 
-export default model("room", newsSchema);
+export default model("room", roomSchema);

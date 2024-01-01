@@ -51,6 +51,7 @@ export const createOneRoom: RequestHandler = async (req, res, next) => {
       layoutInfo,
       facilityInfo,
       amenityInfo,
+      availableQuantity,
     } = req.body;
 
     const result = await RoomModel.create({
@@ -66,6 +67,7 @@ export const createOneRoom: RequestHandler = async (req, res, next) => {
       layoutInfo,
       facilityInfo,
       amenityInfo,
+      availableQuantity,
     });
 
     res.send({
@@ -92,6 +94,7 @@ export const updateRoomById: RequestHandler = async (req, res, next) => {
       layoutInfo,
       facilityInfo,
       amenityInfo,
+      availableQuantity,
     } = req.body;
 
     const result = await RoomModel.findByIdAndUpdate(
@@ -109,6 +112,7 @@ export const updateRoomById: RequestHandler = async (req, res, next) => {
         layoutInfo,
         facilityInfo,
         amenityInfo,
+        availableQuantity,
       },
       {
         new: true,

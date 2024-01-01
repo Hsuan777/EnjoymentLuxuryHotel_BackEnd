@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express";
 import createHttpError from "http-errors";
-import OrderModel from "@/models/order";
+import OrderModel, { type IOrder } from "@/models/order";
 import RoomModel from "@/models/room";
 
 export const getOrderList: RequestHandler = async (_req, res, next) => {
@@ -93,41 +93,9 @@ export const updateOrderById: RequestHandler = async (req, res, next) => {
       throw createHttpError(404, "此訂單不存在");
     }
 
-    // 如果 status 為 1 以及 isPay 為 true，表示訂單已確認，則更新房型的 bookedDates
+    // 如果 status 為 1 表示訂單已確認，則更新房型的 bookedDates
     if (status === 1 && isPay) {
-      const { bookingInfo } = result;
-      for (const item of bookingInfo) {
-        const { roomTypeId, arrivalDate, departureDate, quantity } = item;
-
-        const room = await RoomModel.findById(roomTypeId);
-        if (!room) {
-          throw createHttpError(404, "此房型不存在");
-        }
-
-        const bookedDates = room.bookedDates;
-
-        const dateList = getDatesBetween(arrivalDate, departureDate);
-
-        for (const date of dateList) {
-          const index = bookedDates.findIndex(
-            (item) => item.bookedDate.toISOString() === date.toISOString()
-          );
-
-          if (index === -1) {
-            bookedDates.push({
-              bookedDate: date,
-              bookedQuantity: quantity,
-              orderId: result._id,
-              userId: result.userId,
-            });
-          }
-        }
-        await RoomModel.findByIdAndUpdate(
-          roomTypeId,
-          { bookedDates },
-          { new: true }
-        );
-      }
+      updateRoomBookedDates(result, 1);
     }
 
     res.send({
@@ -141,14 +109,22 @@ export const updateOrderById: RequestHandler = async (req, res, next) => {
 
 export const deleteOrderById: RequestHandler = async (req, res, next) => {
   try {
-    const result = await OrderModel.findByIdAndUpdate(
+    const result = await OrderModel.findById(req.params.id);
+    if (result?.isPay) {
+      throw createHttpError(400, "此訂單已結帳，請更新狀態後再操作");
+    }
+    const updateResult = await OrderModel.findByIdAndUpdate(
       req.params.id,
       { status: -1 },
       { new: true, runValidators: true }
     );
 
-    if (!result) {
+    if (!updateResult) {
       throw createHttpError(404, "此訂單不存在");
+    }
+
+    if (updateResult.status === -1) {
+      updateRoomBookedDates(updateResult, -1);
     }
 
     res.send({
@@ -159,12 +135,49 @@ export const deleteOrderById: RequestHandler = async (req, res, next) => {
   }
 };
 
-function getDatesBetween(arrivalDate: Date, departureDate: Date) {
-  const dateList = [];
-  const currentDate = new Date(arrivalDate);
-  while (currentDate < new Date(departureDate)) {
-    dateList.push(new Date(currentDate));
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-  return dateList;
-}
+const updateRoomBookedDates = async (order: IOrder, status: number) => {
+  const { bookingInfo } = order;
+  bookingInfo.forEach(async (item) => {
+    const { arrivalDate, departureDate, quantity } = item;
+    const room = await RoomModel.findOne(item.roomTypeId);
+    if (!room) {
+      throw createHttpError(404, "此房型不存在");
+    }
+    // 對於該範圍內的每一天
+    for (
+      let date = new Date(arrivalDate.setHours(0, 0, 0, 0));
+      date < new Date(departureDate.setHours(0, 0, 0, 0));
+      date.setDate(date.getDate() + 1)
+    ) {
+      // 找到 dailyAvailability 陣列中對應的物件
+      let availability = room.dailyAvailability.find(
+        (daily) =>
+          daily.date.getFullYear() === date.getFullYear() &&
+          daily.date.getMonth() === date.getMonth() &&
+          daily.date.getDate() === date.getDate() &&
+          daily.orderId.toString() === order._id.toString()
+      );
+      // 如果不存在，則創建新的物件
+      if (!availability && status === 1) {
+        room.dailyAvailability.push({
+          date: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
+          orderId: order._id,
+          bookedQuantity: quantity,
+        });
+      } else if (availability && status === 1) {
+        availability.bookedQuantity = quantity;
+        availability.orderId = order._id;
+      } else if (availability && status === -1) {
+        // 移除相關訂單 Id 的物件
+        room.dailyAvailability.forEach((daily, index) => {
+          if (daily.orderId.toString() === order._id.toString()) {
+            room.dailyAvailability.splice(index, 1);
+          }
+        });
+      }
+    }
+
+    // 將更新後的 dailyAvailability 陣列保存回資料庫
+    room.save();
+  });
+};
