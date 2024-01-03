@@ -16,6 +16,8 @@ export interface IOrder extends Document {
   totalPrice: number;
   status: number;
   notes: string;
+  merchantOrderNo: number;
+  timeStamp: number;
 }
 
 const orderSchema = new Schema<IOrder>(
@@ -71,6 +73,12 @@ const orderSchema = new Schema<IOrder>(
     },
     notes: {
       type: String,
+    },
+    merchantOrderNo: {
+      type: Number,
+    },
+    timeStamp: {
+      type: Number,
     },
   },
   {

@@ -2,6 +2,21 @@ import type { RequestHandler } from "express";
 import createHttpError from "http-errors";
 import OrderModel, { type IOrder } from "@/models/order";
 import RoomModel from "@/models/room";
+import UserModel from "@/models/user";
+import axios from "axios";
+import crypto from "crypto";
+import "dotenv/config";
+
+const {
+  MerchantID,
+  HASHKEY,
+  HASHIV,
+  Version,
+  PayGateWay,
+  NotifyUrl,
+  ReturnUrl,
+} = process.env;
+const RespondType = "JSON";
 
 export const getOrderList: RequestHandler = async (_req, res, next) => {
   try {
@@ -57,22 +72,50 @@ export const createOrder: RequestHandler = async (req, res, next) => {
   try {
     const { userId, bookingInfo, guestCount, totalPrice, notes } = req.body;
 
+    const timeStamp = Math.round(new Date().getTime() / 1000);
     const order = new OrderModel({
       userId,
       bookingInfo,
       guestCount,
       totalPrice,
       notes,
+      merchantOrderNo: timeStamp,
+      timeStamp: timeStamp,
     });
 
     const result = await order.save();
+    const newebpayResponse = await createNewebpayOrder(order);
 
     await OrderModel.populate(result, [{ path: "bookingInfo.roomTypeId" }]);
 
     res.send({
       status: true,
       result,
+      newebpayResponse,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const newebpayNotify: RequestHandler = async (req, res, next) => {
+  try {
+    const response = req.body;
+    // 解密交易內容
+    const data = createSesDecrypt(response.TradeInfo);
+    // 取得交易內容，並查詢資料庫是否有相符的訂單
+    const result = await OrderModel.findOne({
+      merchantOrderNo: data.MerchantOrderNo,
+    });
+    if (!result) {
+      throw createHttpError(404, "此訂單不存在");
+    }
+    // 更新訂單狀態
+    result.isPay = true;
+    result.status = 1;
+    await result.save();
+    // 更新房型的 bookedDates
+    updateRoomBookedDates(result, 1);
   } catch (error) {
     next(error);
   }
@@ -181,3 +224,72 @@ const updateRoomBookedDates = async (order: IOrder, status: number) => {
     room.save();
   });
 };
+
+const createNewebpayOrder = async (order: IOrder) => {
+  const user = await UserModel.findById(order.userId);
+  if (!user) {
+    throw createHttpError(404, "無此用戶喔～");
+  }
+
+  const aesEncrypt = createSesEncrypt(order);
+  const shaEncrypt = createShaEncrypt(aesEncrypt);
+
+  const data = {
+    MerchantID: MerchantID,
+    RespondType: "JSON",
+    TimeStamp: Math.round(new Date().getTime() / 1000),
+    Version: "2.0",
+    MerchantOrderNo: order.merchantOrderNo,
+    Amt: order.totalPrice,
+    ItemDesc: order.notes,
+    Email: user.email,
+    aesEncrypt: aesEncrypt,
+    shaEncrypt: shaEncrypt,
+  };
+
+  const response = await axios.post(
+    "https://ccore.newebpay.com/MPG/mpg_gateway",
+    data
+  );
+
+  return response.data;
+};
+
+async function genDataChain(order: IOrder) {
+  const user = await UserModel.findById(order.userId);
+  if (!user) {
+    throw createHttpError(404, "無此用戶喔～");
+  }
+
+  return `MerchantID=${MerchantID}&TimeStamp=${
+    order.timeStamp
+  }&Version=${Version}&RespondType=${RespondType}&MerchantOrderNo=${
+    order.merchantOrderNo
+  }&Amt=${order.totalPrice}&NotifyURL=${encodeURIComponent(
+    NotifyUrl
+  )}&ReturnURL=${encodeURIComponent(ReturnUrl)}&ItemDesc=${encodeURIComponent(
+    order.notes
+  )}&Email=${encodeURIComponent(user.email)}`;
+}
+
+async function createSesEncrypt(TradeInfo: IOrder) {
+  const encrypt = crypto.createCipheriv("aes-256-cbc", HASHKEY, HASHIV);
+  const enc = encrypt.update(await genDataChain(TradeInfo), "utf8", "hex");
+  return enc + encrypt.final("hex");
+}
+
+function createShaEncrypt(aesEncrypt: Promise<string>) {
+  const sha = crypto.createHash("sha256");
+  const plainText = `HashKey=${HASHKEY}&${aesEncrypt}&HashIV=${HASHIV}`;
+
+  return sha.update(plainText).digest("hex").toUpperCase();
+}
+
+function createSesDecrypt(TradeInfo: string) {
+  const decrypt = crypto.createDecipheriv("aes256", HASHKEY, HASHIV);
+  decrypt.setAutoPadding(false);
+  const text = decrypt.update(TradeInfo, "hex", "utf8");
+  const plainText = text + decrypt.final("utf8");
+  const result = plainText.replace(/[\x00-\x20]+/g, "");
+  return JSON.parse(result);
+}

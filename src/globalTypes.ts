@@ -15,6 +15,11 @@ declare global {
       EMAILER_PASSWORD: string;
 
       NODE_ENV: "development" | "production";
+
+      NotifyUrl: string;
+      ReturnUrl: string;
+      HASHKEY: string;
+      HASHIV: string;
     }
   }
 
