@@ -1,21 +1,12 @@
-import type { RequestHandler } from "express";
+import type { RequestHandler, Request } from "express";
 import createHttpError from "http-errors";
 import OrderModel, { type IOrder } from "@/models/order";
 import RoomModel from "@/models/room";
-import UserModel from "@/models/user";
-import axios from "axios";
 import crypto from "crypto";
 import "dotenv/config";
 
-const {
-  MerchantID,
-  HASHKEY,
-  HASHIV,
-  Version,
-  PayGateWay,
-  NotifyUrl,
-  ReturnUrl,
-} = process.env;
+const { MerchantID, HASHKEY, HASHIV, Version, NotifyUrl, ReturnUrl } =
+  process.env;
 const RespondType = "JSON";
 
 export const getOrderList: RequestHandler = async (_req, res, next) => {
@@ -73,7 +64,7 @@ export const createOrder: RequestHandler = async (req, res, next) => {
     const { userId, bookingInfo, guestCount, totalPrice, notes } = req.body;
 
     const timeStamp = Math.round(new Date().getTime() / 1000);
-    const order = new OrderModel({
+    const order = {
       userId,
       bookingInfo,
       guestCount,
@@ -81,10 +72,13 @@ export const createOrder: RequestHandler = async (req, res, next) => {
       notes,
       merchantOrderNo: timeStamp,
       timeStamp: timeStamp,
-    });
+    };
 
-    const result = await order.save();
-    const newebpayResponse = await createNewebpayOrder(order);
+    const result = await OrderModel.create(order);
+    const newebpayResponse = await createNewebpayOrder(
+      result,
+      req.user?.email || ""
+    );
 
     await OrderModel.populate(result, [{ path: "bookingInfo.roomTypeId" }]);
 
@@ -225,42 +219,26 @@ const updateRoomBookedDates = async (order: IOrder, status: number) => {
   });
 };
 
-const createNewebpayOrder = async (order: IOrder) => {
-  const user = await UserModel.findById(order.userId);
-  if (!user) {
-    throw createHttpError(404, "無此用戶喔～");
-  }
-
-  const aesEncrypt = createSesEncrypt(order);
+const createNewebpayOrder = async (order: IOrder, email: string) => {
+  const aesEncrypt = createSesEncrypt(order, email);
   const shaEncrypt = createShaEncrypt(aesEncrypt);
 
   const data = {
     MerchantID: MerchantID,
     RespondType: "JSON",
-    TimeStamp: Math.round(new Date().getTime() / 1000),
+    TimeStamp: order.timeStamp,
     Version: "2.0",
     MerchantOrderNo: order.merchantOrderNo,
     Amt: order.totalPrice,
     ItemDesc: order.notes,
-    Email: user.email,
+    Email: email,
     aesEncrypt: aesEncrypt,
     shaEncrypt: shaEncrypt,
   };
-
-  const response = await axios.post(
-    "https://ccore.newebpay.com/MPG/mpg_gateway",
-    data
-  );
-
-  return response.data;
+  return data;
 };
 
-async function genDataChain(order: IOrder) {
-  const user = await UserModel.findById(order.userId);
-  if (!user) {
-    throw createHttpError(404, "無此用戶喔～");
-  }
-
+function genDataChain(order: IOrder, email: string) {
   return `MerchantID=${MerchantID}&TimeStamp=${
     order.timeStamp
   }&Version=${Version}&RespondType=${RespondType}&MerchantOrderNo=${
@@ -269,16 +247,16 @@ async function genDataChain(order: IOrder) {
     NotifyUrl
   )}&ReturnURL=${encodeURIComponent(ReturnUrl)}&ItemDesc=${encodeURIComponent(
     order.notes
-  )}&Email=${encodeURIComponent(user.email)}`;
+  )}&Email=${encodeURIComponent(email)}`;
 }
 
-async function createSesEncrypt(TradeInfo: IOrder) {
+function createSesEncrypt(TradeInfo: IOrder, email: string) {
   const encrypt = crypto.createCipheriv("aes-256-cbc", HASHKEY, HASHIV);
-  const enc = encrypt.update(await genDataChain(TradeInfo), "utf8", "hex");
+  const enc = encrypt.update(genDataChain(TradeInfo, email), "utf8", "hex");
   return enc + encrypt.final("hex");
 }
 
-function createShaEncrypt(aesEncrypt: Promise<string>) {
+function createShaEncrypt(aesEncrypt: string) {
   const sha = crypto.createHash("sha256");
   const plainText = `HashKey=${HASHKEY}&${aesEncrypt}&HashIV=${HASHIV}`;
 
