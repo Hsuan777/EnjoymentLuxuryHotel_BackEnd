@@ -64,7 +64,7 @@ export const sendVerificationCode: RequestHandler = async (req, res, next) => {
   }
 };
 
-const getTransporter = async () => {
+export const getTransporter = async () => {
   const { EMAILER_USER, EMAILER_PASSWORD } = process.env;
 
   if (!EMAILER_USER || !EMAILER_PASSWORD) {
