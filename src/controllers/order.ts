@@ -98,10 +98,12 @@ export const newebpayNotify: RequestHandler = async (req, res, next) => {
     console.log(response);
     // 解密交易內容
     const data = createSesDecrypt(response.TradeInfo);
+    console.log(data);
     // 取得交易內容，並查詢資料庫是否有相符的訂單
     const result = await OrderModel.findOne({
       merchantOrderNo: data.MerchantOrderNo,
     });
+    console.log(result);
     if (!result) {
       throw createHttpError(404, "此訂單不存在");
     }
