@@ -96,40 +96,39 @@ export const createOrder: RequestHandler = async (req, res, next) => {
 export const newebpayNotify: RequestHandler = async (req, res, next) => {
   try {
     const response = req.body;
-    console.log(response);
+
     // 解密交易內容
-    const data = createSesDecrypt(response.TradeInfo);
-    console.log(data);
+    const { Result } = createSesDecrypt(response.TradeInfo);
     // 取得交易內容，並查詢資料庫是否有相符的訂單
-    // const result = await OrderModel.findOne({
-    //   merchantOrderNo: Result.MerchantOrderNo,
-    // }).populate("userId");
+    const result = await OrderModel.findOne({
+      merchantOrderNo: Result.MerchantOrderNo,
+    }).populate("userId");
 
-    // if (!result) {
-    //   throw createHttpError(404, "此訂單不存在");
-    // }
-    // if (
-    //   !result.userId ||
-    //   typeof result.userId !== "object" ||
-    //   !("email" in result.userId)
-    // ) {
-    //   throw createHttpError(500, "使用者資訊不存在");
-    // }
-    // // 更新訂單狀態
-    // result.isPay = true;
-    // result.status = 1;
-    // await result.save();
-    // // 更新房型的 bookedDates
-    // updateRoomBookedDates(result, 1);
+    if (!result) {
+      throw createHttpError(404, "此訂單不存在");
+    }
+    if (
+      !result.userId ||
+      typeof result.userId !== "object" ||
+      !("email" in result.userId)
+    ) {
+      throw createHttpError(500, "使用者資訊不存在");
+    }
+    // 更新訂單狀態
+    result.isPay = true;
+    result.status = 1;
+    await result.save();
+    // 更新房型的 bookedDates
+    updateRoomBookedDates(result, 1);
 
-    // const transporter = await getTransporter();
+    const transporter = await getTransporter();
 
-    // await transporter.sendMail({
-    //   from: process.env.EMAILER_USER,
-    //   to: result.userId.email as string,
-    //   subject: "享樂旅館 - 訂房成功",
-    //   html: `<p>恭喜您訂房成功，歡迎您的到來。</p>`,
-    // });
+    await transporter.sendMail({
+      from: process.env.EMAILER_USER,
+      to: result.userId.email as string,
+      subject: "享樂旅館 - 訂房成功",
+      html: `<p>恭喜您訂房成功，歡迎您的到來。</p>`,
+    });
     return res.end();
   } catch (error) {
     next(error);
