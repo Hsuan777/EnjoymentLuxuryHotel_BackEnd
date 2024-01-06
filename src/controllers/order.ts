@@ -96,10 +96,10 @@ export const createOrder: RequestHandler = async (req, res, next) => {
 export const newebpayNotify: RequestHandler = async (req, res, next) => {
   try {
     const response = req.body;
-
+    console.log(response);
     // 解密交易內容
-    const { Result } = createSesDecrypt(response.TradeInfo);
-    console.log(Result);
+    const data = createSesDecrypt(response.TradeInfo);
+    console.log(data);
     // 取得交易內容，並查詢資料庫是否有相符的訂單
     // const result = await OrderModel.findOne({
     //   merchantOrderNo: Result.MerchantOrderNo,
