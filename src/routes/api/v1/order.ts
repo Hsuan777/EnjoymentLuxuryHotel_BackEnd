@@ -165,7 +165,7 @@ router.delete(
   OrderController.deleteOrderById
 );
 
-// newebpayNotify
 router.post("/newebpayNotify", OrderController.newebpayNotify);
 
+router.post("/newebpayReturn", OrderController.newebpayReturn);
 export default router;

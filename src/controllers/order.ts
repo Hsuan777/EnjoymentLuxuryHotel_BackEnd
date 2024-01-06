@@ -156,6 +156,11 @@ export const newebpayNotify: RequestHandler = async (req, res, next) => {
   }
 };
 
+export const newebpayReturn: RequestHandler = async (req, res, next) => {
+  console.log(req);
+  return res.redirect(ReturnUrl);
+};
+
 export const updateOrderById: RequestHandler = async (req, res, next) => {
   try {
     const { bookingInfo, guestCount, totalPrice, notes, status, isPay } =
