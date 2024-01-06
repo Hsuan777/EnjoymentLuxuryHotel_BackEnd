@@ -6,8 +6,15 @@ import crypto from "crypto";
 import "dotenv/config";
 import { getTransporter } from "@/controllers/verify";
 
-const { MerchantID, HASHKEY, HASHIV, Version, NotifyUrl, ReturnUrl } =
-  process.env;
+const {
+  MerchantID,
+  HASHKEY,
+  HASHIV,
+  Version,
+  NotifyUrl,
+  ReturnUrl,
+  RedirectUrl,
+} = process.env;
 const RespondType = "JSON";
 
 export const getOrderList: RequestHandler = async (_req, res, next) => {
@@ -157,8 +164,24 @@ export const newebpayNotify: RequestHandler = async (req, res, next) => {
 };
 
 export const newebpayReturn: RequestHandler = async (req, res, next) => {
-  console.log(req);
-  return res.redirect(ReturnUrl);
+  try {
+    const response = req.body;
+
+    // 解密交易內容
+    const { Result } = createSesDecrypt(response.TradeInfo);
+    // 取得交易內容，並查詢資料庫是否有相符的訂單
+    const result = await OrderModel.findOne({
+      merchantOrderNo: Result.MerchantOrderNo,
+    });
+    if (!result) {
+      throw createHttpError(404, "此訂單不存在");
+    }
+    return res.redirect(
+      `${RedirectUrl}?MerchantOrderNo=${result.merchantOrderNo}`
+    );
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const updateOrderById: RequestHandler = async (req, res, next) => {
@@ -291,11 +314,9 @@ function genDataChain(order: IOrder, email: string) {
     order.merchantOrderNo
   }&Amt=${order.totalPrice}&NotifyURL=${encodeURIComponent(
     NotifyUrl
-  )}&ReturnURL=${encodeURIComponent(
-    `${ReturnUrl}?MerchantOrderNo=${order.merchantOrderNo}`
-  )}&ItemDesc=${encodeURIComponent(order.notes)}&Email=${encodeURIComponent(
-    email
-  )}`;
+  )}&ReturnURL=${encodeURIComponent(ReturnUrl)}&ItemDesc=${encodeURIComponent(
+    order.notes
+  )}&Email=${encodeURIComponent(email)}`;
 }
 
 function createSesEncrypt(TradeInfo: IOrder, email: string) {
