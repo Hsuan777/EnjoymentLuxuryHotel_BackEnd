@@ -60,6 +60,27 @@ export const getOrderById: RequestHandler = async (req, res, next) => {
   }
 };
 
+// 取得對應的 merchantOrderNo 訂單，並返回成功訊息
+export const getOrderByMerchantOrderNo: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  try {
+    const result = await OrderModel.findOne({
+      merchantOrderNo: req.params.id,
+    });
+    if (!result) {
+      throw createHttpError(404, "此訂單不存在");
+    }
+    res.send({
+      status: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const createOrder: RequestHandler = async (req, res, next) => {
   try {
     const { userId, bookingInfo, guestCount, totalPrice, notes } = req.body;
@@ -267,7 +288,7 @@ function genDataChain(order: IOrder, email: string) {
     NotifyUrl
   )}&ReturnURL=${encodeURIComponent(
     `${ReturnUrl}?MerchantOrderNo=${order.merchantOrderNo}`
-  )}}&ItemDesc=${encodeURIComponent(order.notes)}&Email=${encodeURIComponent(
+  )}&ItemDesc=${encodeURIComponent(order.notes)}&Email=${encodeURIComponent(
     email
   )}`;
 }

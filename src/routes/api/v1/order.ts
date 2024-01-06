@@ -65,6 +65,26 @@ router.get(
   OrderController.getOrderById
 );
 
+// getOrderByMerchantOrderNo
+router.get(
+  /**
+     * #swagger.description  = "取得對應的 merchantOrderNo 訂單，並返回成功訊息"
+     * #swagger.responses[200] = {
+            schema: {
+                "status": true,
+            }
+        }
+     * #swagger.responses[404] = {
+            schema: {
+                "status": false,
+                "message": "此訂單不存在",
+            }
+        }
+     */
+  "/merchantOrderNo/:id",
+  OrderController.getOrderByMerchantOrderNo
+);
+
 // 新增一筆訂單
 router.post(
   /**
