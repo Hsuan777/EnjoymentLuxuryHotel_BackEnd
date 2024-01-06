@@ -22,17 +22,7 @@ const newsSchema = new Schema<INews>(
       required: [true, "image 未填寫"],
       validate: {
         validator(value: string) {
-          const isValidUrl = validator.isURL(value, { protocols: ["https"] });
-          const allowedExtensions = ["jpg", "jpeg", "png", "gif"];
-          const urlExtension = new URL(value).pathname
-            .split(".")
-            .pop()
-            ?.toLowerCase();
-          return (
-            isValidUrl &&
-            urlExtension &&
-            allowedExtensions.includes(urlExtension)
-          );
+          return validator.isURL(value, { protocols: ["https"] });
         },
         message: "image 網址協定或附檔名不正確",
       },
