@@ -103,25 +103,25 @@ export const newebpayNotify: RequestHandler = async (req, res, next) => {
     const result = await OrderModel.findOne({
       merchantOrderNo: Result.MerchantOrderNo,
     }).populate("userId");
+    console.log(result);
+    // if (!result) {
+    //   throw createHttpError(404, "此訂單不存在");
+    // }
+    // if (
+    //   !result.userId ||
+    //   typeof result.userId !== "object" ||
+    //   !("email" in result.userId)
+    // ) {
+    //   throw createHttpError(500, "使用者資訊不存在");
+    // }
+    // // 更新訂單狀態
+    // result.isPay = true;
+    // result.status = 1;
+    // await result.save();
+    // // 更新房型的 bookedDates
+    // updateRoomBookedDates(result, 1);
 
-    if (!result) {
-      throw createHttpError(404, "此訂單不存在");
-    }
-    if (
-      !result.userId ||
-      typeof result.userId !== "object" ||
-      !("email" in result.userId)
-    ) {
-      throw createHttpError(500, "使用者資訊不存在");
-    }
-    // 更新訂單狀態
-    result.isPay = true;
-    result.status = 1;
-    await result.save();
-    // 更新房型的 bookedDates
-    updateRoomBookedDates(result, 1);
-
-    const transporter = await getTransporter();
+    // const transporter = await getTransporter();
 
     await transporter.sendMail({
       from: process.env.EMAILER_USER,
