@@ -265,9 +265,11 @@ function genDataChain(order: IOrder, email: string) {
     order.merchantOrderNo
   }&Amt=${order.totalPrice}&NotifyURL=${encodeURIComponent(
     NotifyUrl
-  )}&ReturnURL=${encodeURIComponent(ReturnUrl)}&ItemDesc=${encodeURIComponent(
-    order.notes
-  )}&Email=${encodeURIComponent(email)}`;
+  )}&ReturnURL=${encodeURIComponent(
+    `${ReturnUrl}?MerchantOrderNo=${order.merchantOrderNo}`
+  )}}&ItemDesc=${encodeURIComponent(order.notes)}&Email=${encodeURIComponent(
+    email
+  )}`;
 }
 
 function createSesEncrypt(TradeInfo: IOrder, email: string) {
