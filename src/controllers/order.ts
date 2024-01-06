@@ -123,12 +123,12 @@ export const newebpayNotify: RequestHandler = async (req, res, next) => {
 
     // const transporter = await getTransporter();
 
-    await transporter.sendMail({
-      from: process.env.EMAILER_USER,
-      to: result.userId.email as string,
-      subject: "享樂旅館 - 訂房成功",
-      html: `<p>恭喜您訂房成功，歡迎您的到來。</p>`,
-    });
+    // await transporter.sendMail({
+    //   from: process.env.EMAILER_USER,
+    //   to: result.userId.email as string,
+    //   subject: "享樂旅館 - 訂房成功",
+    //   html: `<p>恭喜您訂房成功，歡迎您的到來。</p>`,
+    // });
     return res.end();
   } catch (error) {
     next(error);
