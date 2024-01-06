@@ -122,6 +122,7 @@ export const createOrder: RequestHandler = async (req, res, next) => {
 };
 
 export const newebpayNotify: RequestHandler = async (req, res, next) => {
+  // #swagger.ignore = true
   try {
     const response = req.body;
 
@@ -164,6 +165,7 @@ export const newebpayNotify: RequestHandler = async (req, res, next) => {
 };
 
 export const newebpayReturn: RequestHandler = async (req, res, next) => {
+  // #swagger.ignore = true
   try {
     const response = req.body;
 
