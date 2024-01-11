@@ -6,7 +6,7 @@ import { generateToken, verifyToken } from "@/utils";
 
 export const signup: RequestHandler = async (req: Request, res, next) => {
   try {
-    const { name, email, password, phone, birthday } = req.body;
+    const { name, email, password, phone, birthday, address } = req.body;
 
     const checkEmail = await UsersModel.findOne({ email });
     if (checkEmail) throw createHttpError(400, "此 Email 已註冊");
@@ -17,6 +17,7 @@ export const signup: RequestHandler = async (req: Request, res, next) => {
       password: await bcrypt.hash(password, 6),
       phone,
       birthday,
+      address,
     });
 
     // password 不使用，因此使用 _ 代替
@@ -117,7 +118,7 @@ export const updateInfo: RequestHandler = async (req, res, next) => {
     // 若有 req.user 有 oldPassword 與 newPassword，則嘗試更新密碼
     await updateUserPassword(req);
 
-    const { userId, name, phone, birthday } = req.body;
+    const { userId, name, phone, birthday, address } = req.body;
 
     const result = await UsersModel.findByIdAndUpdate(
       userId,
@@ -125,6 +126,7 @@ export const updateInfo: RequestHandler = async (req, res, next) => {
         name,
         phone,
         birthday,
+        address,
       },
       {
         new: true,
