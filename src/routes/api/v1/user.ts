@@ -73,6 +73,10 @@ router.post(
                   "name": "Vic",
                   "email": "vics@example.com",
                   "phone": "0922123456",
+                  "address": {
+                      "zipcode": 100,
+                      "detail": "台北市中正區忠孝東路一段 1 號",
+                  },
                   "birthday": "1982-02-03T16:00:00.000Z",
                   "createdAt": "2023-12-20T15:40:31.526Z",
                   "updatedAt": "2023-12-20T15:40:31.526Z",
@@ -153,6 +157,10 @@ router.get(
                   "name": "Vic",
                   "email": "vics@example.com",
                   "phone": "0922123456",
+                  "address": {
+                      "zipcode": 100,
+                      "detail": "台北市中正區忠孝東路一段 1 號",
+                  },
                   "birthday": "1982-02-03T16:00:00.000Z",
                   "createdAt": "2023-12-20T15:40:31.526Z",
                   "updatedAt": "2023-12-20T15:40:31.526Z",
