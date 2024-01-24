@@ -20,7 +20,11 @@ router.post(
               email: "vics@example.com",
               password: "Vv123456",
               phone: "0922123456",
-              birthday: "1982/2/4 or 1982-2-4",
+              birthday: "1982-2-4",
+              address: {
+                  zipcode: 100,
+                  detail: "台北市中正區忠孝東路一段 1 號",
+              }
           }
       }
    * #swagger.responses[200] = {
