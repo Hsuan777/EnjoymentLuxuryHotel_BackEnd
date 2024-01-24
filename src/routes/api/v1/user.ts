@@ -175,7 +175,11 @@ router.put(
               userId: "6523e9fc3a22dd8d8207ef80",
               name: "Vics",
               phone: "0922123456",
-              birthday: "1948/6/5",
+              birthday: "1948-06-05",
+              address: {
+                  zipcode: 100,
+                  detail: "台北市中正區忠孝東路一段 2 號",
+              }
               oldPassword: "舊密碼",
               newPassword: "新密碼",
           }
