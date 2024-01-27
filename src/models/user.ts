@@ -70,6 +70,7 @@ const userSchema = new Schema<IUser>(
       zipcode: {
         type: Number,
         required: [true, "zipcode 未填寫"],
+        default: 100,
         validate: {
           validator(value: number) {
             return zipCodeList.includes(value);
