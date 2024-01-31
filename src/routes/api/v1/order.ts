@@ -60,7 +60,6 @@ router.get(
      */
   "/:id",
   isAuth,
-  checkAuthorize,
   checkObjectID,
   OrderController.getOrderById
 );
@@ -106,7 +105,6 @@ router.post(
      */
   "/",
   isAuth,
-  checkAuthorize,
   OrderController.createOrder
 );
 
