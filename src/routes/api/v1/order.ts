@@ -158,7 +158,6 @@ router.delete(
      */
   "/:id",
   isAuth,
-  checkAuthorize,
   checkObjectID,
   OrderController.deleteOrderById
 );
