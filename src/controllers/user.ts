@@ -3,13 +3,21 @@ import UsersModel from "@/models/user";
 import createHttpError from "http-errors";
 import bcrypt from "bcryptjs";
 import { generateToken, verifyToken } from "@/utils";
+import mongoose from "mongoose";
 
 export const signup: RequestHandler = async (req: Request, res, next) => {
   try {
     const { name, email, password, phone, birthday, address } = req.body;
 
     const checkEmail = await UsersModel.findOne({ email });
-    if (checkEmail) throw createHttpError(400, "此 Email 已註冊");
+    // if (checkEmail) throw createHttpError(400, "此 Email 已註冊");
+    if (checkEmail) {
+      res.status(400).send({
+        status: false,
+        message: "此 Email 已註冊",
+      });
+      return;
+    }
 
     const _user = await UsersModel.create({
       name,
@@ -36,6 +44,13 @@ export const signup: RequestHandler = async (req: Request, res, next) => {
       user,
     });
   } catch (err) {
+    if (err instanceof mongoose.Error.ValidationError) {
+      res.status(400).send({
+        status: false,
+        message: err.message,
+      });
+      return;
+    }
     next(err);
   }
 };
@@ -45,10 +60,24 @@ export const login: RequestHandler = async (req, res, next) => {
     const { email, password } = req.body;
 
     const _user = await UsersModel.findOne({ email }).select("+password");
-    if (!_user) throw createHttpError(400, "此使用者不存在");
+    // if (!_user) throw createHttpError(400, "帳號或密碼錯誤");
+    if (!_user) {
+      res.status(400).send({
+        status: false,
+        message: "帳號或密碼錯誤",
+      });
+      return;
+    }
 
     const checkPassword = await bcrypt.compare(password, _user.password);
-    if (!checkPassword) throw createHttpError(400, "密碼錯誤");
+    // if (!checkPassword) throw createHttpError(400, "帳號或密碼錯誤");
+    if (!checkPassword) {
+      res.status(400).send({
+        status: false,
+        message: "帳號或密碼錯誤",
+      });
+      return;
+    }
 
     const { password: _, ...user } = _user.toObject();
 
